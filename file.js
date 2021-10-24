@@ -4,7 +4,15 @@ const pino = require('./pino')
 const { once } = require('events')
 
 module.exports = async function (opts = {}) {
-  const destination = pino.destination({ dest: opts.destination || 1, sync: false })
+  const destination = pino.destination({ dest: normalizeDest(opts.destination || 1), sync: false })
   await once(destination, 'ready')
+  return destination
+}
+
+function normalizeDest (destination) {
+  const fd = Number(destination)
+  if (typeof destination === 'string' && Number.isFinite(fd)) {
+    return fd
+  }
   return destination
 }
